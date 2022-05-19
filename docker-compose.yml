@@ -1,0 +1,55 @@
+version: '3'
+services:
+
+  #PHP Service
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+      args:
+        user: langame
+        uid: 1000
+    container_name: php
+    environment:
+      SERVICE_NAME: php
+      SERVICE_TAGS: dev
+    working_dir: /www
+    volumes:
+      - ./www:/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - langame-network
+
+  #Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    working_dir: /www    
+    ports:
+      - 80:80
+    volumes:
+      - ./www:/www
+      - ./log/nginx:/var/log/nginx/
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - langame-network
+
+  db:
+    image: mysql:8
+    ports:
+      - 3306:3306
+    working_dir: /www
+    environment:
+      MYSQL_DATABASE: blog 
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password_user
+      MYSQL_USER: langame
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    networks:
+      - langame-network
+
+#Docker Networks
+networks:
+  langame-network:
+    driver: bridge
