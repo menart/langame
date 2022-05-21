@@ -45,7 +45,7 @@ services:
       MYSQL_PASSWORD: password_user
       MYSQL_USER: langame
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./db:/var/lib/mysql
     networks:
       - langame-network
 
