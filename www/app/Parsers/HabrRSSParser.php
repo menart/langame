@@ -16,15 +16,16 @@ class HabrRSSParser implements Parser
     {
         $xml = new \SimpleXMLElement($rawText);
         $arrayNewsDTO = [];
-        foreach ($xml->item as $item) {
+        foreach ($xml->channel->item as $item) {
             $newsDTO = new NewsDTO();
             $newsDTO->title = trim((string)$item->title);
             $newsDTO->description = trim((string)$item->description);
             $newsDTO->context = trim($this->getContext((string)$item->link));
-            $newsDTO->categories = [];
+            $categories = [];
             foreach ($item->category as $category) {
-                $newsDTO->categories[] = (string)$category;
+                $categories[] = (string)$category;
             }
+            $newsDTO->categories = array_unique($categories);
             $arrayNewsDTO[] = $newsDTO;
         }
         return $arrayNewsDTO;
@@ -32,9 +33,10 @@ class HabrRSSParser implements Parser
 
     private function getContext(string $url): string
     {
-        $rawHTML = file_get_contents($url);
+        libxml_use_internal_errors(true);
         $domDocument = new \DOMDocument();
-        $domDocument->loadHTML($rawHTML);
-        return $domDocument->getElementById("post-content-body")->textContent;
+        $domDocument->loadHTMLFile($url);
+        libxml_use_internal_errors(false);
+        return (string)$domDocument->getElementById("post-content-body")->C14N();
     }
 }

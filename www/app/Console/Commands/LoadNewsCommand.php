@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Loaders\URLLoader;
+use App\Parsers\HabrRSSParser;
+use App\Repository\NewsRepository;
 use Illuminate\Console\Command;
 
 class LoadNewsCommand extends Command
@@ -27,6 +30,13 @@ class LoadNewsCommand extends Command
      */
     public function handle()
     {
+        $loader = new URLLoader();
+        $habr = new HabrRSSParser();
+        $newsHabrDTO = $habr->parse($loader->load('https://habr.com/ru/rss/best/daily/?fl=ru'));
+        $newsRepository = new NewsRepository();
+        foreach ($newsHabrDTO as $newsDTO){
+            $newsRepository->new($newsDTO);
+        }
         return 0;
     }
 }

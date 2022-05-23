@@ -16,9 +16,12 @@ return new class extends Migration
         if (!Schema::hasTable('category_news')) {
             Schema::create('category_news', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('category_id');
-                $table->foreignId('news_id');
-                $table->timestamps();
+                $table->unsignedBigInteger('category_id');
+                $table->unsignedBigInteger('news_id');
+
+                $table->foreign('category_id')->references('id')->on('categories');
+                $table->foreign('news_id')->references('id')->on('news');
+
             });
         }
     }
