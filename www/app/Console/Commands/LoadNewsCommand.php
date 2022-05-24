@@ -32,7 +32,9 @@ class LoadNewsCommand extends Command
     {
         $loader = new URLLoader();
         $habr = new HabrRSSParser();
+        echo "Загружаем ...";
         $newsHabrDTO = $habr->parse($loader->load('https://habr.com/ru/rss/best/daily/?fl=ru'));
+        echo "insert db ...";
         $newsRepository = new NewsRepository();
         foreach ($newsHabrDTO as $newsDTO){
             $newsRepository->new($newsDTO);

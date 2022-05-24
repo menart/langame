@@ -37,6 +37,8 @@ class HabrRSSParser implements Parser
         $domDocument = new \DOMDocument();
         $domDocument->loadHTMLFile($url);
         libxml_use_internal_errors(false);
-        return (string)$domDocument->getElementById("post-content-body")->C14N();
+        $pattern = '/<a href="https:\/\/habr.com\/ru([^"]*)<\/a>/';
+        $result = $domDocument->getElementById("post-content-body")->C14N();
+        return preg_replace($pattern, '', $result);;
     }
 }
